@@ -3,10 +3,17 @@ from twitchio.ext import commands, routines
 from db_loader import load_db
 from osu import Mods
 import discord
+import requests as r
 from discord.ext import commands as dcommands
 import random
+import os,sys
+import subprocess as sp
 import argparse
 import asyncio
+try:
+    os.chdir('recbot/')
+except Exception as e:
+    pass
 parser = argparse.ArgumentParser(prog='plink',description='plonk',epilog='pleep', exit_on_error=False)
 parser.add_argument('-mods', '-m')
 parser.add_argument('-ppmin', '-min', type=int)
@@ -188,6 +195,26 @@ async def kill(ctx):
     else:
         await send(ctx, "ICANT bozo tried to kill")
 
+
+@bot.command(name = "gitpull")
+async def gitpull(ctx):
+    if ctx.author.name.lower() == "rrex972":
+        await send(ctx, "Pulling latest changes from GitHub and restarting.")
+        zip = r.get('https://github.com/rrex971/TastyBot/archive/refs/heads/main.zip')
+        os.chdir('..')
+        open('recbot.zip', 'wb').write(zip.content)
+        await bot.close()
+        await dbot.close()
+        try:
+            sp.call('sh', '/recbot/pull.sh')
+        except:
+            print("On Windows, no shell script") 
+        try:
+            os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+        except Exception as e:
+            print(e)
+    else:
+        await send(ctx, "erm you cant use this Awkward")
 
 @bot.command(name='link')
 async def link(ctx, *usernameL):
