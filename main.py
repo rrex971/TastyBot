@@ -206,7 +206,7 @@ async def gitpull(ctx):
         await bot.close()
         await dbot.close()
         try:
-            sp.call(['sh', '/recbot/pull.sh'])
+            sp.call(['sh', '/storage/self/primary/recbot/pull.sh'])
         except:
             print("On Windows, no shell script") 
         try:
