@@ -178,9 +178,7 @@ async def dm(ctx, *messageL):
     await user.send(f"""Message from {ctx.author.name}: {message}""")
     await send(ctx, f"{ctx.author.mention} successfully sent your dm to @rrex972 DinkDonk")
     
-@bot.command(name = 'pushtest')
-async def pushtest(ctx):
-    await send(ctx, "PogU it works")
+
 @bot.command(name = "meow")
 async def meow(ctx):
     await send(ctx, "meow")
@@ -208,7 +206,7 @@ async def gitpull(ctx):
         await bot.close()
         await dbot.close()
         try:
-            sp.call('sh', '/recbot/pull.sh')
+            sp.call(['sh', '/recbot/pull.sh'])
         except:
             print("On Windows, no shell script") 
         try:
