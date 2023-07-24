@@ -10,6 +10,10 @@ import os,sys
 import subprocess as sp
 import argparse
 import asyncio
+from datetime import datetime as dt
+
+startTime = dt.now()
+
 try:
     os.chdir('recbot/')
 except Exception as e:
@@ -72,6 +76,16 @@ async def check_live():
 
 @commands.cooldown(rate=1, per=0.1, bucket=commands.Bucket.channel)
 
+@bot.command(name="uptime")
+async def uptime(ctx):
+    
+    timeString, timeDelta = time_elapsed_str(startTime)
+    print(timeDelta)
+    ending = "ok"
+    if timeDelta > 86400: ending="PogU WTF"
+    if timeDelta > 172800: ending="NAILS 2 day uptime will it die"
+    if timeDelta > 259200: ending="ICANT how is the bot still alive"
+    await send(ctx, f"The bot has been running for {timeString} {ending} ")
 
 @bot.command(name="battery")
 async def battery(ctx):
@@ -309,6 +323,27 @@ def get_user_osu(authorid):
     else:
         return None
 
+def time_elapsed_str(start_time):
+    current_time = dt.now()
+    time_elapsed = current_time - start_time
+
+    days = time_elapsed.days
+    seconds = time_elapsed.seconds
+
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    time_parts = []
+    if days > 0:
+        time_parts.append(f"{days} day{'s' if days > 1 else ''}")
+    if hours > 0:
+        time_parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+    if minutes > 0:
+        time_parts.append(f"{minutes} minute{'s' if minutes > 1 else ''}")
+    if seconds > 0:
+        time_parts.append(f"{seconds} second{'s' if seconds > 1 else ''}")
+
+    return " ".join(time_parts), seconds
 
 async def run_bots():
     tasks = [dbot.start(configdict['discord_token']), bot.start()]
