@@ -30,6 +30,7 @@ parser.add_argument('-maxl', '-maxlength', type=int)
 
 api = init_api()
 dbot = dcommands.Bot(command_prefix='!', intents=discord.Intents.default())
+initch = ['rrex972', 'btmc', 'getchanned', 'znxtech', 'ronawayfromme']
 
 c, db = load_db()
 invmodValues = {0:'NM', 8:'HD', 16:'HR', 64:'DT', 576:'NC', 1024: "FL", 2: "EZ", 256: "HT"}
@@ -47,7 +48,7 @@ bot = commands.Bot(token=configdict["oauth"],
     client_id=configdict["client_id"],
     nick=configdict["bot_name"],
     prefix=configdict["prefix"],
-    initial_channels=['rrex972', 'btmc', 'getchanned', 'znxtech'], heartbeat=15) 
+    initial_channels=initch, heartbeat=15) 
 
 
 @bot.event()
@@ -69,10 +70,29 @@ async def check_live():
         user = await i.user()
         print("Checking: ", user.name)
         res = await bot.search_channels(query=user.name)
-        if res[0].live and user.name not in onlineAccess:
-            await bot.part_channels([user.name])
-            print(user)
-            print(f'Parted channel {user.name} due to being live.')     
+        for ch in res:
+            if ch.name.lower() == user.name.lower() and user.name not in onlineAccess:
+                if ch.live:
+                    await bot.part_channels([user.name])
+                    print(user)
+                    print(f'Parted channel {user.name} due to being live.')
+                break
+
+@routines.routine(seconds = 5.0)
+async def reconnect():
+    await bot.wait_for_ready()
+    for i in initch:
+        if (i in [user.name for user in [await x.user() for x in bot.connected_channels]]) or (i in onlineAccess):
+            continue    
+        print(f"CheckingReconnect: {i}")
+        res = await bot.search_channels(query=i)
+        for ch in res:
+            if ch.name.lower() == i.lower():
+                if not ch.live:
+                    await bot.join_channels([i])
+                    print(f"Reconnected to channel {i} successfully.")
+                    break
+
 
 @commands.cooldown(rate=1, per=0.1, bucket=commands.Bucket.channel)
 
@@ -343,13 +363,14 @@ def time_elapsed_str(start_time):
     if seconds > 0:
         time_parts.append(f"{seconds} second{'s' if seconds > 1 else ''}")
 
-    return " ".join(time_parts), seconds
+    return " ".join(time_parts), time_elapsed.seconds
 
 async def run_bots():
     tasks = [dbot.start(configdict['discord_token']), bot.start()]
     await asyncio.gather(*tasks)
 
 check_live.start()
+reconnect.start()
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run_bots())
 
