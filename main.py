@@ -39,7 +39,7 @@ config = open("config.txt")
 configlist = config.readlines()
 configdict = {}
 
-onlineAccess = []
+onlineAccess = ['rrex972']
 
 for i in configlist:
     configdict[i.split(":",maxsplit=1)[0].strip()] = i.split(":",maxsplit=1)[1].strip()
