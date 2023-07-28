@@ -30,7 +30,7 @@ parser.add_argument('-maxl', '-maxlength', type=int)
 
 api = init_api()
 dbot = dcommands.Bot(command_prefix='!', intents=discord.Intents.default())
-initch = ['rrex972', 'btmc', 'getchanned', 'znxtech']
+initch = ['rrex972', 'btmc', 'getchanned', 'znxtech', 'scribnami_code']
 
 c, db = load_db()
 invmodValues = {0:'NM', 8:'HD', 16:'HR', 64:'DT', 576:'NC', 1024: "FL", 2: "EZ", 256: "HT"}
@@ -39,7 +39,7 @@ config = open("config.txt")
 configlist = config.readlines()
 configdict = {}
 
-onlineAccess = ['rrex972']
+onlineAccess = ['rrex972', 'scribnami_code']
 
 for i in configlist:
     configdict[i.split(":",maxsplit=1)[0].strip()] = i.split(":",maxsplit=1)[1].strip()
