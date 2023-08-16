@@ -11,6 +11,7 @@ import subprocess as sp
 import argparse
 import asyncio
 from datetime import datetime as dt
+from date_util import format_date
 
 startTime = dt.now()
 
@@ -96,6 +97,57 @@ async def reconnect():
 
 @commands.cooldown(rate=1, per=0.1, bucket=commands.Bucket.channel)
 
+@bot.command(name = "rs", aliases = ["recent"])
+async def rs(ctx, *args):
+    user = None
+    mode = "osu"
+    if args == ():
+        user = get_user_osu(ctx.author.id)[0]
+        if user == None:
+            await send(ctx, "no profile linked, link osu profile with <link")
+            return
+    else:
+        arglist = []
+        for i in range(len(args)):
+            if args[i] == "-m":
+                mode = args[i+1]
+                if mode == "1":
+                    mode = "taiko"
+                if mode == "2":
+                    mode = "fruits"
+                if mode == "3":
+                    mode = "mania"
+        for i in range(len(args)):
+            if "-" not in args[i] and (("-" not in args[i-1]) if i != 0 else True):
+                try:
+                    user = api.get_user(user=args[i]).id
+                    break
+                except:
+                    user = get_user_osu(ctx.author.id)[0]
+                    if user == None:
+                        await send(ctx, "no profile linked, link osu profile with <link")
+                        return
+                
+    print(user)
+    userObj = api.get_user(user=user)
+    username = userObj.username
+    try:  
+        score = api.get_user_scores(user=user,type="recent", include_fails=True,mode=mode, limit=1)[0]
+        mods = score.mods
+        if mods == None:
+            mods = "NM"
+    except IndexError:
+        await ctx.send(f"/me No recent scores for user {username}")
+        return
+    mapcombo = api.get_beatmap(score.beatmap.id).max_combo
+    if score.pp == None:
+        ppL=""
+    else:
+        ppL = f"{round(score.pp, 2)}pp"
+    if score.passed:
+        await ctx.send(f"""/me Recent score for user {username}: {score.beatmapset.artist} - {score.beatmapset.title} [{score.beatmap.version}] +{mods} ({score.beatmapset.creator}, {score.beatmap.difficulty_rating}*) {round(score.accuracy*100, 2)}% {score.max_combo}/{mapcombo} | ({score.statistics.count_300}/{score.statistics.count_100}/{score.statistics.count_50}/{score.statistics.count_miss}) | {ppL} (1 million pp if FC Pogpega im not implementing pp calculation logic) | {format_date(score.created_at)} ago""")
+    else:
+        await ctx.send(f"""/me Recent score for user {username}: (Failed {int(float((score.max_combo/mapcombo)*100))}%)    {score.beatmapset.artist} - {score.beatmapset.title} [{score.beatmap.version}] +{mods} ({score.beatmapset.creator}, {score.beatmap.difficulty_rating}*) {round(score.accuracy*100, 2)}% {score.max_combo}/{mapcombo} | ({score.statistics.count_300}/{score.statistics.count_100}/{score.statistics.count_50}/{score.statistics.count_miss}) | (1 million pp if FC Pogpega im not implementing pp calculation logic) | {format_date(score.created_at)} ago""")
 @bot.command(name="uptime")
 async def uptime(ctx):
     
