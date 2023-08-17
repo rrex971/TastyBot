@@ -1,9 +1,14 @@
 import osu_diff_calc as odc
 from osu import Client, GameModeStr, Beatmapset, BeatmapsetSearchFilter, GameModeInt, Mods
+config = open("config.txt")
+configlist = config.readlines()
+configdict = {}
+for i in configlist:
+    configdict[i.split(":",maxsplit=1)[0].strip()] = i.split(":",maxsplit=1)[1].strip()
 
 def init_api():
     global api
-    api = Client.from_client_credentials(20810, "tNVBdaVDZL3naL2fZDUFrRQOwhFo8aGgg9bLB0Es", None)
+    api = Client.from_client_credentials(configdict['osu_clientid'], configdict['osu_clientsecret'], None)
     return api
 
 def calculate_pp(beatmap_attributes, beatmap, score_attributes):
