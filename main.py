@@ -153,7 +153,7 @@ async def uptime(ctx):
     
     timeString, timeDelta = time_elapsed_str(startTime)
     print(timeDelta)
-    ending = "ok"
+    ending = "Okay"
     if timeDelta > 86400: ending="PogU WTF"
     if timeDelta > 172800: ending="NAILS 2 day uptime will it die"
     if timeDelta > 259200: ending="ICANT how is the bot still alive"
@@ -285,6 +285,13 @@ async def kill(ctx):
 async def gitpull(ctx):
     if ctx.author.name.lower() == "rrex972":
         await send(ctx, "Pulling latest changes from GitHub and restarting.")
+        await bot.close()
+        await dbot.close()
+        try:
+            sp.call(['sh', './pull.sh'])
+        except:
+            print("Unable to execute pull.sh")
+        '''
         zip = r.get('https://github.com/rrex971/TastyBot/archive/refs/heads/main.zip')
         os.chdir('..')
         open('recbot.zip', 'wb').write(zip.content)
@@ -298,6 +305,7 @@ async def gitpull(ctx):
             os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
         except Exception as e:
             print(e)
+        '''
     else:
         await send(ctx, "erm you cant use this Awkward")
 
